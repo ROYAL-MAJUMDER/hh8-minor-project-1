@@ -1,0 +1,48 @@
+STEP 1: Create Project Folder 
+
+Open Terminal and run:
+
+mkdir brute_force_detector
+cd brute_force_detector
+
+
+STEP 2: Create Main Python Files
+
+touch app.py
+touch detector.py
+touch firewall.py
+touch database.db
+
+
+STEP 3: Create Sub-Folders
+mkdir templates
+mkdir static
+mkdir logs
+
+
+STEP 4: Create HTML, CSS, and Log Files
+touch templates/dashboard.html
+touch static/style.css
+touch logs/auth.log
+
+
+STEP 5: Add Test Log Data 
+
+Open the log file:
+
+nano logs/auth.log
+
+
+Paste this:
+
+Jan 7 10:01:12 server sshd[1234]: Failed password for root from 192.168.1.10 port 4444 ssh2
+Jan 7 10:01:15 server sshd[1234]: Failed password for root from 192.168.1.10 port 4444 ssh2
+Jan 7 10:01:18 server sshd[1234]: Failed password for root from 192.168.1.10 port 4444 ssh2
+
+
+
+STEP 6: Verify Structure
+
+Run:
+
+tree
