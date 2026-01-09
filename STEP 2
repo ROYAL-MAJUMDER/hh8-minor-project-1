@@ -1,0 +1,74 @@
+STEP 2.1:
+nano detector.py
+
+
+STEP 2.2: 
+import re
+import time
+from collections import defaultdict
+
+# Regex pattern to match failed SSH login
+FAILED_LOGIN_PATTERN = r"Failed password.*from (\d+\.\d+\.\d+\.\d+)"
+
+# Thresholds
+MAX_ATTEMPTS = 3        # attempts before flagging
+TIME_WINDOW = 30        # seconds
+
+# Store attempts per IP
+attempts = defaultdict(list)
+
+def detect_bruteforce(log_file):
+    attackers = set()
+
+    with open(log_file, "r") as file:
+        for line in file:
+            match = re.search(FAILED_LOGIN_PATTERN, line)
+
+            if match:
+                ip = match.group(1)
+                current_time = time.time()
+
+                # Save timestamp
+                attempts[ip].append(current_time)
+
+                # Remove old attempts outside time window
+                attempts[ip] = [
+                    t for t in attempts[ip]
+                    if current_time - t <= TIME_WINDOW
+                ]
+
+                # Detection logic
+                if len(attempts[ip]) >= MAX_ATTEMPTS:
+                    attackers.add(ip)
+
+    return attackers
+
+
+
+    STEP 2.3: Save & Exit
+
+
+
+    STEP 2.4: 
+
+Create a temporary test file:
+
+nano test_detector.py
+
+
+Paste:
+
+from detector import detect_bruteforce
+
+attackers = detect_bruteforce("logs/auth.log")
+
+print("Detected attackers:")
+for ip in attackers:
+    print(ip)
+
+
+Save & exit.
+
+Run:
+
+python3 test_detector.py
