@@ -1,0 +1,47 @@
+STEP 3.1: 
+nano firewall.py
+
+STEP 3.2: 
+import subprocess
+
+def block_ip(ip):
+    """
+    Blocks the given IP using iptables
+    """
+    try:
+        subprocess.run(
+            ["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"],
+            check=True
+        )
+        print(f"[+] IP blocked successfully: {ip}")
+    except subprocess.CalledProcessError:
+        print(f"[-] Failed to block IP: {ip}")
+
+
+STEP 3.3: 
+
+sudo iptables -L -n
+sudo iptables -A INPUT -s 10.10.10.10 -j DROP
+
+
+STEP 3.4: 
+
+nano main.py
+
+
+Paste:
+
+from detector import detect_bruteforce
+from firewall import block_ip
+
+LOG_FILE = "logs/auth.log"
+
+attackers = detect_bruteforce(LOG_FILE)
+
+for ip in attackers:
+    block_ip(ip)
+
+
+
+    STEP 3.5: Run Full Detection + Blocking
+sudo python3 main.py
