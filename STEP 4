@@ -1,0 +1,93 @@
+STEP 4.1: 
+nano db_init.py
+
+
+Paste:
+
+import sqlite3
+
+conn = sqlite3.connect("database.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS blocked_ips (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip TEXT NOT NULL,
+    blocked_time TEXT NOT NULL
+)
+""")
+
+conn.commit()
+conn.close()
+
+print("[+] Database initialized successfully")
+
+
+python3 db_init.py
+
+
+
+STEP 4.2: 
+
+nano db.py
+
+
+Paste:
+
+import sqlite3
+from datetime import datetime
+
+DB_NAME = "database.db"
+
+def insert_blocked_ip(ip):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO blocked_ips (ip, blocked_time) VALUES (?, ?)",
+        (ip, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    )
+
+    conn.commit()
+    conn.close()
+
+
+STEP 4.3: 
+
+
+
+nano firewall.py
+
+Replace content with:
+import subprocess
+from db import insert_blocked_ip
+
+def block_ip(ip):
+    try:
+        subprocess.run(
+            ["sudo", "iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"],
+            check=True
+        )
+        insert_blocked_ip(ip)
+        print(f"[+] Blocked & logged IP: {ip}")
+    except subprocess.CalledProcessError:
+        print(f"[-] Failed to block IP: {ip}")
+
+
+
+STEP 4.4: 
+
+Rsudo python3 main.py
+
+🔍 Verify Database Content
+sqlite3 database.db
+
+
+Inside SQLite shell:
+
+SELECT * FROM blocked_ips;
+
+
+Exit SQLite:
+
+.exit
