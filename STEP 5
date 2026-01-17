@@ -1,0 +1,70 @@
+STEP 5.1: Install Fail2Ban
+sudo apt update
+sudo apt install fail2ban -y
+
+
+Check status:
+
+sudo systemctl status fail2ban
+
+
+STEP 5.2: Configure Fail2Ban for SSH
+
+Create local config:
+
+sudo nano /etc/fail2ban/jail.local
+
+
+Paste:
+
+[sshd]
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 3
+findtime = 60
+bantime  = 600
+
+
+Save & exit.
+
+Restart Fail2Ban:
+
+sudo systemctl restart fail2ban
+
+ STEP 5.3: Verify Fail2Ban Is Working
+sudo fail2ban-client status sshd
+
+
+Expected:
+
+Currently banned: 1
+
+STEP 5.4: Sync Fail2Ban Logs with Your Website
+
+Fail2Ban logs blocked IPs here:
+
+/var/log/fail2ban.log
+
+
+Add this script (optional but powerful):
+
+nano fail2ban_sync.py
+
+import re
+from db import insert_blocked_ip
+
+LOG = "/var/log/fail2ban.log"
+PATTERN = r"Ban (\d+\.\d+\.\d+\.\d+)"
+
+with open(LOG) as f:
+    for line in f:
+        match = re.search(PATTERN, line)
+        if match:
+            insert_blocked_ip(match.group(1))
+
+
+Run:
+
+sudo python3 fail2ban_sync.py
