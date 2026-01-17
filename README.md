@@ -8,7 +8,7 @@ The project uses Python for log parsing and attack detection, iptables for firew
 
 HOW TO RUN THE PROJECT 
 
-The project is executed on a Linux system. Authentication logs are monitored using Python scripts. Run the detection module with sudo to enable firewall blocking. The Flask application is started separately to display blocked IPs on a web dashboard, accessible through a local browser using the specified port.
+The project is executed on a Linux system. Authentication logs are monitored using Python scripts. Run the detection module with sudo to enable firewall blocking. 
 
  I LEARNED 
 
