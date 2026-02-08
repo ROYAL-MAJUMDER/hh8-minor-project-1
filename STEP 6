@@ -1,0 +1,64 @@
+6.1-
+
+sudo apt install -y python3 sqlite3 iptables
+
+6.2-  Creating database
+
+sqlite3 database.db
+
+6.3 — Creating table 
+DROP TABLE IF EXISTS blocked_ips;
+
+CREATE TABLE blocked_ips (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip TEXT NOT NULL,
+    attempts INTEGER,
+    blocked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+6.4 — Exiting the sqlite
+.exit
+
+ 6.5 — Verifying the table
+sqlite3 database.db "PRAGMA table_info(blocked_ips);"
+
+6.6 — Create detector file
+nano detector.py
+
+6.7 — Paste THIS EXACT CODE
+import sqlite3
+import subprocess
+
+DB = "database.db"
+FAILED_IP = "10.0.0.5"
+ATTEMPTS = 5
+
+def block_ip(ip):
+    subprocess.run(["iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"])
+    print(f"[+] IP blocked successfully: {ip}")
+
+def detect_bruteforce():
+    conn = sqlite3.connect(DB)
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO blocked_ips (ip, attempts)
+        VALUES (?, ?)
+    """, (FAILED_IP, ATTEMPTS))
+
+    conn.commit()
+    conn.close()
+
+    block_ip(FAILED_IP)
+
+if __name__ == "__main__":
+    detect_bruteforce()
+
+6.8 — RUN PROGRAM
+sudo python3 detector.py
+
+6.9 — CHECK DATABASE OUTPUT
+sqlite3 database.db "SELECT * FROM blocked_ips;"
+
+ 6.10 — Check iptables rules
+sudo iptables -L -n --line-numbers
